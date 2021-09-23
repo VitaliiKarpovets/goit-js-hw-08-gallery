@@ -63,3 +63,103 @@ const galleryItems = [
     description: 'Lighthouse Coast Sea',
   },
 ];
+
+// Create refs
+
+const imagesGallery = document.querySelector('.js-gallery');
+const modal = document.querySelector('.js-lightbox');
+const modalContent = document.querySelector('.lightbox__image');
+const dataSource = [];
+
+// Create list of images
+
+const makeImageAtt = ({ preview, description, original }) => {
+  return `<li class="gallery__item">
+   <a
+    class="gallery__link"
+    href = ${original}
+    >
+    <img
+    class="gallery__image"
+    src = ${preview}
+    data-source = ${original} 
+    alt = ${description}
+    />
+    </a>
+    </li>`;
+}
+
+const makeListEls = galleryItems.map(makeImageAtt).join('');
+
+imagesGallery.insertAdjacentHTML('afterbegin', makeListEls);
+
+// Add event listener to open modal window
+
+imagesGallery.addEventListener('click', openModal)
+  
+function openModal(e) {
+  const imageEl = e.target.classList.contains('gallery__image');
+  if (!imageEl) {
+    return;
+  }
+
+  e.preventDefault();
+  modal.classList.add("is-open");
+  modalContent.src = e.target.dataset.source;
+  modalContent.alt = e.target.alt;
+  }
+
+// Add event listeners to close modal window
+
+modal.querySelector('.lightbox__button').addEventListener('click', (evt) => {
+  modal.classList.remove('is-open');
+  modalContent.src = '';
+})
+
+document.addEventListener('keyup', closeModalESC)
+
+function closeModalESC(evt) {
+  if (evt.which == 27) {
+    modal.classList.remove('is-open');
+    modalContent.src = '';
+  }
+}
+
+modal.querySelector('.lightbox__overlay').addEventListener('click', (evt) => {
+  modal.classList.remove('is-open');
+  modalContent.src = '';
+})
+
+// Make scroll image
+
+const imagesArray = document.querySelectorAll('.gallery__image');
+imagesArray.forEach(element => {
+  dataSource.push(element.dataset.source)
+})
+
+console.log(dataSource)
+
+document.addEventListener('keydown', e => {
+  const currentIndex = dataSource.indexOf(modalContent.src)
+  if (e.key === 'ArrowLeft') {
+    buttonLeft(currentIndex)
+  } else if (e.key === 'ArrowRight') {
+      buttonRight(currentIndex)
+    }
+})
+
+function buttonLeft(currentIndex) {
+  let nextIndex = currentIndex - 1;
+  if (nextIndex == -1) {
+    nextIndex = dataSource.length - 1;
+  }
+  modalContent.src = dataSource[nextIndex]
+}
+
+function buttonRight(currentIndex) {
+  let nextIndex = currentIndex + 1;
+  if (nextIndex === dataSource.length) {
+    nextIndex = 0;
+  }
+  modalContent.src = dataSource[nextIndex]
+}
