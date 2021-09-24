@@ -107,13 +107,21 @@ function openModal(e) {
   modal.classList.add("is-open");
   modalContent.src = e.target.dataset.source;
   modalContent.alt = e.target.alt;
-  }
+
+  const imagesArray = document.querySelectorAll('.gallery__image');
+  imagesArray.forEach(element => {
+  dataSource.push(element.dataset.source)
+  })
+
+  window.addEventListener('keydown', slideImage)
+}
 
 // Add event listeners to close modal window
 
 modal.querySelector('.lightbox__button').addEventListener('click', (evt) => {
   modal.classList.remove('is-open');
   modalContent.src = '';
+  window.removeEventListener('keydown', slideImage)
 })
 
 document.addEventListener('keyup', closeModalESC)
@@ -122,32 +130,27 @@ function closeModalESC(evt) {
   if (evt.which == 27) {
     modal.classList.remove('is-open');
     modalContent.src = '';
+    window.removeEventListener('keydown', slideImage)
   }
 }
 
 modal.querySelector('.lightbox__overlay').addEventListener('click', (evt) => {
   modal.classList.remove('is-open');
   modalContent.src = '';
+  window.removeEventListener('keydown', slideImage)
 })
 
 // Make scroll image
 
-const imagesArray = document.querySelectorAll('.gallery__image');
-imagesArray.forEach(element => {
-  dataSource.push(element.dataset.source)
-})
-
-console.log(dataSource)
-
-document.addEventListener('keydown', e => {
+function slideImage(e) {
   const currentIndex = dataSource.indexOf(modalContent.src)
   if (e.key === 'ArrowLeft') {
     buttonLeft(currentIndex)
   } else if (e.key === 'ArrowRight') {
       buttonRight(currentIndex)
     }
-})
-
+}
+  
 function buttonLeft(currentIndex) {
   let nextIndex = currentIndex - 1;
   if (nextIndex == -1) {
@@ -163,3 +166,4 @@ function buttonRight(currentIndex) {
   }
   modalContent.src = dataSource[nextIndex]
 }
+
